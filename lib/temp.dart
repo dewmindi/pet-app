@@ -26,7 +26,7 @@ class ChannelState extends State<Channel> {
           },
           child: Icon(
             Icons.arrow_back,
-            color: Colors.white,
+            color: Colors.black,
           ),
         ),
         actions: [
@@ -93,10 +93,15 @@ class ChannelState extends State<Channel> {
                         borderRadius: BorderRadius.circular(5),
                       ),
                       child: Center(
-                        child: Icon(
-                          Icons.search,
-                          color: Colors.white,
-                          size: 25,
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Icon(
+                            Icons.search,
+                            color: Colors.white,
+                            size: 25,
+                          ),
                         ),
                       ),
                     ),
@@ -119,7 +124,7 @@ class ChannelState extends State<Channel> {
                 children: [
                   Container(
                     child: Text(
-                      'Top Rated',
+                      'Recommended',
                       style: TextStyle(
                         color: Color(0xff363636),
                         fontSize: 20,

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firstapp/screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -17,9 +18,23 @@ class _SplashscreenState extends State<Splashscreen> {
   void initState(){
     super.initState();
     Timer(
-      Duration(seconds: 3),
-        () => Navigator.push(context, MaterialPageRoute(builder: (context)=> WelcomeScreen(),))
+      Duration(seconds: 10),
+        () => _checkAuthentication(),
     );
+  }
+
+  Future<void> _checkAuthentication()async{
+    User ? user = FirebaseAuth.instance.currentUser;
+    if(user!=null){
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context)=> Homepage()),
+      );
+    }else {
+      // User is not signed in, navigate to SignInScreen
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => WelcomeScreen()),
+      );
+    }
   }
 
   @override
@@ -31,9 +46,9 @@ class _SplashscreenState extends State<Splashscreen> {
         decoration: BoxDecoration(
           color: Colors.indigo,
           image: DecorationImage(
-            image: AssetImage('assets/splash_images/dog.jpg'),
+            image: AssetImage('assets/splash_images/startScreen.jpg'),
             fit: BoxFit.cover,
-            opacity: 0.4,
+            opacity: 0.6,
           ),
         ),
         child: Center(
@@ -43,14 +58,14 @@ class _SplashscreenState extends State<Splashscreen> {
               Image(
                 image: AssetImage(
                     //'assets/splash_images/iconDog.png',
-                    'assets/splash_images/Dogicon.png',
+                    'assets/splash_images/animals.png',
                 ),
-                height: 200,
-                width: 200,
+                height: 150,
+                width: 150,
                 color: Colors.black54,
               ),
               Text(
-                  'Baw Baw',
+                  'PetPal',
                 style: TextStyle(
                   fontWeight: FontWeight.w500,
                   fontSize: 50,

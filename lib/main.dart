@@ -1,10 +1,12 @@
-import 'package:firstapp/feedingProvider.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firstapp/pillsProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'screens/splashscreen.dart';
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -14,12 +16,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => FeedingScheduleProvider()),
-        ChangeNotifierProvider(create: (_) => pillsProvider()),
-      ],
-      child: MaterialApp(
+    return MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         theme: ThemeData(
@@ -27,8 +24,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
         ),
         home: const Splashscreen(),
-      ),
-    );
+      );
   }
 }
 

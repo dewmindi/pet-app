@@ -1,12 +1,10 @@
 import 'package:firstapp/home.dart';
 import 'package:firstapp/screens/signup_screen.dart';
+import 'package:firstapp/services/authentication.dart';
 import 'package:firstapp/widgets/custom_scaffold.dart';
 import 'package:flutter/material.dart';
-// import 'package:icons_plus/icons_plus.dart';
-// import 'package:login_signup/screens/signup_screen.dart';
-// import 'package:login_signup/widgets/custom_scaffold.dart';
-
 import '../theme/theme.dart';
+import 'adminLogin.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -16,8 +14,51 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
   final _formSignInKey = GlobalKey<FormState>();
+  bool agreePersonalData = true;
   bool rememberPassword = true;
+  bool isLoading = false;
+
+  @override
+  void dispose(){
+    super.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+  }
+
+  Future<void> signInUser() async {
+    if (_formSignInKey.currentState!.validate() && agreePersonalData) {
+      setState(() {
+        isLoading = true;
+      });
+
+      String res = await AuthMethod().loginUser(
+        email: emailController.text,
+        password: passwordController.text,
+      );
+
+      setState(() {
+        isLoading = false;
+      });
+      print(res);
+      if (res == "Success") {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => Homepage()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error: $res")),
+        );
+      }
+    } else if (!agreePersonalData) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please agree to the processing of personal data')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
@@ -58,6 +99,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         height: 40.0,
                       ),
                       TextFormField(
+                        controller: emailController,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter Email';
@@ -88,6 +130,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         height: 25.0,
                       ),
                       TextFormField(
+                        controller: passwordController,
                         obscureText: true,
                         obscuringCharacter: '*',
                         validator: (value) {
@@ -158,29 +201,41 @@ class _SignInScreenState extends State<SignInScreen> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () {
-                            if (_formSignInKey.currentState!.validate() &&
-                                rememberPassword) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Processing Data'),
-                                ),
-                              );
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context)=>Homepage()),
-                              );
-                            } else if (!rememberPassword) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text(
-                                        'Please agree to the processing of personal data')),
-                              );
-                            }
-                          },
-                          child: const Text('Sign in'),
+                          onPressed: signInUser,
+                          child: isLoading
+                              ? CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white),
+                          )
+                              : const Text('Log In'),
                         ),
                       ),
+                      // SizedBox(
+                      //   width: double.infinity,
+                      //   child: ElevatedButton(
+                      //     onPressed: () {
+                      //       if (_formSignInKey.currentState!.validate() &&
+                      //           rememberPassword) {
+                      //         ScaffoldMessenger.of(context).showSnackBar(
+                      //           const SnackBar(
+                      //             content: Text('Processing Data'),
+                      //           ),
+                      //         );
+                      //         Navigator.push(
+                      //             context,
+                      //             MaterialPageRoute(builder: (context)=>Homepage()),
+                      //         );
+                      //       } else if (!rememberPassword) {
+                      //         ScaffoldMessenger.of(context).showSnackBar(
+                      //           const SnackBar(
+                      //               content: Text(
+                      //                   'Please agree to the processing of personal data')),
+                      //         );
+                      //       }
+                      //     },
+                      //     child: const Text('Sign in'),
+                      //   ),
+                      // ),
                       const SizedBox(
                         height: 12.0,
                       ),
@@ -219,6 +274,34 @@ class _SignInScreenState extends State<SignInScreen> {
                       ),
                       const SizedBox(
                         height: 20.0,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            'Login As An Admin',
+                            style: TextStyle(
+                              color: Colors.black45,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (e) => LoginPage(),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              'Log in',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: lightColorScheme.primary,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

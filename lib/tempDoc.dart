@@ -1,8 +1,9 @@
 import 'dart:ui';
-
+import 'package:firstapp/screens/appointments.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:firstapp/screens/appointmentDetails.dart';
 
 class DoctorDetailPage extends StatefulWidget {
   final String doctorName;
@@ -33,6 +34,20 @@ class _DoctorDetailState extends State<DoctorDetailPage> {
       setState(() {
         isLoading = false;
       });
+
+      AppointmentDetails().doctorName = widget.doctorName;
+      AppointmentDetails().date = selectedDate;
+      AppointmentDetails().time = selectedTime;
+      
+      Navigator.of(context).push(
+          MaterialPageRoute(
+              builder: (context)=>Appointments(
+                doctorName: widget.doctorName,
+                date: selectedDate,
+                time: selectedTime,
+              )
+          )
+      );
 
       showDialog(
           context: context,

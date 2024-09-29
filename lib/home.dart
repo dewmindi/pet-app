@@ -1,11 +1,13 @@
-import 'package:firstapp/adopt.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firstapp/addpetdetails.dart';
 import 'package:firstapp/feeding.dart';
-import 'package:firstapp/medications.dart';
-import 'package:firstapp/tempHome.dart';
+import 'package:firstapp/pet_list.dart';
 import 'package:firstapp/tempMed.dart';
-import 'package:firstapp/trackpet/tracking.dart';
+import 'package:firstapp/trackpet/pettotrack.dart';
 import 'package:flutter/material.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
+import 'package:firstapp/screens/navbar.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -27,10 +29,10 @@ class _HomepageState extends State<Homepage> {
 
   final List<Widget> _screens = [
     tempHome(),
-    PetAdopt(),
+    PetList(),
     Feeding(),
     tempMed(),
-    Pettrack(),
+    CatTrackApp(),
   ];
 
   @override
@@ -56,9 +58,21 @@ class _HomepageState extends State<Homepage> {
           children: _screens,
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: (){
+          Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context)=>(PetDetails()))
+          );
+        },
+        child: Icon(Icons.add, color: Colors.red,),
+        backgroundColor: Colors.white,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }
+
 
 class tempHome extends StatefulWidget {
   @override
@@ -66,6 +80,26 @@ class tempHome extends StatefulWidget {
 }
 
 class tempHomeState extends State<tempHome> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  String? _userName;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserName();
+  }
+
+  Future<void> _fetchUserName() async {
+    final User? user = _auth.currentUser;
+    if (user != null) {
+      final DocumentSnapshot userData = await _firestore.collection('users').doc(user.uid).get();
+      setState(() {
+        _userName = userData['name'];
+      });
+    }
+  }
   final Map<String, bool> _isHovered = {};
   final Map<String, bool> _isClicked = {};
   @override
@@ -84,15 +118,17 @@ class tempHomeState extends State<tempHome> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            // Text(
-            //   "HI, USER",
-            //   style: TextStyle(color: Colors.white, fontSize: 18),
-            // ),
             GestureDetector(
+              onTap: (){
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context)=>(CatTrackApp()))
+                );
+              },
               child: Container(
                 margin: EdgeInsets.only(right: 10),
                 child: Icon(
-                  Icons.notifications_rounded,
+                  Icons.person_pin,
                   color: Colors.white,
                 ),
               ),
@@ -100,6 +136,7 @@ class tempHomeState extends State<tempHome> {
           ],
         ),
       ),
+      drawer: Navbar(),
 
       body: Container(
         decoration: BoxDecoration(
@@ -125,7 +162,7 @@ class tempHomeState extends State<tempHome> {
                       child: Column(
                         children: [
                           Text(
-                            'Hello, USER...!',
+                            _userName != null ? 'Hello, $_userName!' : 'Hello!',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 color: Colors.black,
@@ -165,7 +202,7 @@ class tempHomeState extends State<tempHome> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const PetAdopt(),
+                              builder: (context) => const PetList(),
                             ),
                           );
                         },
@@ -205,7 +242,7 @@ class tempHomeState extends State<tempHome> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const Pettrack(),
+                              builder: (context) => CatTrackApp(),
                             ),
                           );
                         },
@@ -214,7 +251,7 @@ class tempHomeState extends State<tempHome> {
                   ],
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),

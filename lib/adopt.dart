@@ -14,6 +14,7 @@ class _PetAdoptState extends State<PetAdopt> {
     return  Scaffold(
       backgroundColor: Colors.indigoAccent,
       appBar: AppBar(
+        title: Text('ADOPT'),
         backgroundColor: Colors.indigoAccent,
       ),
       body: Container(
